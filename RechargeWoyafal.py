@@ -17,3 +17,35 @@ class RechargeWoyafal:
     
     def getHistoricAchat(self):
         return self.historic_achat
+
+    def __kw_recharger(self, montant):
+        total_kw_historic = sum(self.historic_achat[UNIT])
+        n_kw = 0
+        # Si on est toujours dans la premiere tranche
+        if total_kw_historic <= MAX_TRANCHE_1:
+            m = (MAX_TRANCHE_1 - total_kw_historic) * PRIX_PAR_TRANCHE[0]
+            if montant > m:
+                n_kw += m / PRIX_PAR_TRANCHE[0]
+                montant -= m
+                total_kw_historic += n_kw
+            else:
+                n_kw += montant / PRIX_PAR_TRANCHE[0]
+                montant = 0
+        # Deuxieme tranche
+        if montant > 0:
+            if total_kw_historic <= MAX_TRANCHE_2:
+                m = (MAX_TRANCHE_2 - total_kw_historic) * PRIX_PAR_TRANCHE[1]
+                if montant > m:
+                    n_kw += m / PRIX_PAR_TRANCHE[1]
+                    # Troisieme tranche
+                    montant = montant - (montant*TVA + m)
+                    n_kw += montant / PRIX_PAR_TRANCHE[2]
+                else:
+                    n_kw += montant / PRIX_PAR_TRANCHE[1]
+                    montant = 0
+            # Troisieme tranche
+            else:
+                    montant -= montant*TVA
+                    n_kw += montant / PRIX_PAR_TRANCHE[2]      
+        return n_kw
+
