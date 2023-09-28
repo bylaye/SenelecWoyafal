@@ -49,3 +49,15 @@ class RechargeWoyafal:
                     n_kw += montant / PRIX_PAR_TRANCHE[2]      
         return n_kw
 
+    def newAchat(self, montant):
+        self.historic_achat["montant"].append(montant)
+        # Le taxe communal est déduit pour tout recharge.
+        montant_deduit = montant * TAXE_COMMUNAL
+        # Si il s'agit de la premiere recharge du mois on deduit la redevance.
+        if sum(self.historic_achat[UNIT]) == 0:
+            montant_deduit += REDEVANCE
+        montant -= montant_deduit
+
+        total_kw = self.__kw_recharger(montant)
+        self.historic_achat[UNIT].append(total_kw)
+        return total_kw
